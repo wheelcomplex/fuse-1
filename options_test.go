@@ -22,7 +22,7 @@ func TestMountOptionFSName(t *testing.T) {
 	}
 	t.Parallel()
 	const name = "FuseTestMarker"
-	mnt, err := fstestutil.MountedT(t, fstestutil.SimpleFS{fstestutil.Dir{}},
+	mnt, err := fstestutil.MountedT(t, fstestutil.SimpleFS{fstestutil.Dir{}}, nil,
 		fuse.FSName(name),
 	)
 	if err != nil {
@@ -45,7 +45,7 @@ func testMountOptionFSNameEvil(t *testing.T, evil string) {
 	}
 	t.Parallel()
 	var name = "FuseTest" + evil + "Marker"
-	mnt, err := fstestutil.MountedT(t, fstestutil.SimpleFS{fstestutil.Dir{}},
+	mnt, err := fstestutil.MountedT(t, fstestutil.SimpleFS{fstestutil.Dir{}}, nil,
 		fuse.FSName(name),
 	)
 	if err != nil {
@@ -102,7 +102,7 @@ func TestMountOptionSubtype(t *testing.T) {
 	}
 	t.Parallel()
 	const name = "FuseTestMarker"
-	mnt, err := fstestutil.MountedT(t, fstestutil.SimpleFS{fstestutil.Dir{}},
+	mnt, err := fstestutil.MountedT(t, fstestutil.SimpleFS{fstestutil.Dir{}}, nil,
 		fuse.Subtype(name),
 	)
 	if err != nil {
@@ -125,7 +125,7 @@ func TestMountOptionSubtype(t *testing.T) {
 
 func TestMountOptionAllowOtherThenAllowRoot(t *testing.T) {
 	t.Parallel()
-	mnt, err := fstestutil.MountedT(t, fstestutil.SimpleFS{fstestutil.Dir{}},
+	mnt, err := fstestutil.MountedT(t, fstestutil.SimpleFS{fstestutil.Dir{}}, nil,
 		fuse.AllowOther(),
 		fuse.AllowRoot(),
 	)
@@ -141,7 +141,7 @@ func TestMountOptionAllowOtherThenAllowRoot(t *testing.T) {
 
 func TestMountOptionAllowRootThenAllowOther(t *testing.T) {
 	t.Parallel()
-	mnt, err := fstestutil.MountedT(t, fstestutil.SimpleFS{fstestutil.Dir{}},
+	mnt, err := fstestutil.MountedT(t, fstestutil.SimpleFS{fstestutil.Dir{}}, nil,
 		fuse.AllowRoot(),
 		fuse.AllowOther(),
 	)
@@ -165,13 +165,14 @@ func TestMountOptionDefaultPermissions(t *testing.T) {
 		t.Skip("FreeBSD does not support DefaultPermissions")
 	}
 	t.Parallel()
+
 	mnt, err := fstestutil.MountedT(t,
 		fstestutil.SimpleFS{
-			fstestutil.ChildMap{"child": unwritableFile{}},
+			&fstestutil.ChildMap{"child": unwritableFile{}},
 		},
+		nil,
 		fuse.DefaultPermissions(),
 	)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -202,11 +203,12 @@ func (createrDir) Create(ctx context.Context, req *fuse.CreateRequest, resp *fus
 
 func TestMountOptionReadOnly(t *testing.T) {
 	t.Parallel()
+
 	mnt, err := fstestutil.MountedT(t,
 		fstestutil.SimpleFS{createrDir{}},
+		nil,
 		fuse.ReadOnly(),
 	)
-
 	if err != nil {
 		t.Fatal(err)
 	}
